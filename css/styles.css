@@ -1,0 +1,238 @@
+:root {
+  --primary: #5b8def;
+  --primary-dark: #3f6cd1;
+  --danger: #e06470;
+  --bg: #f6f7fb;
+  --card-bg: #ffffff;
+  --text: #22262f;
+  --muted: #8a909c;
+  --border: #e4e7ee;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.hidden { display: none !important; }
+
+.screen { min-height: 100vh; display: flex; flex-direction: column; }
+
+#setup-screen {
+  padding: 32px 20px;
+  align-items: stretch;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+#setup-screen h1 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: #fff;
+  color: var(--text);
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+label input, label select {
+  margin-top: 4px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.primary-btn:active { background: var(--primary-dark); }
+
+.primary-btn.active-state {
+  background: var(--danger);
+}
+
+.error {
+  color: var(--danger);
+  text-align: center;
+  min-height: 1.2em;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header strong { font-size: 1.05rem; }
+
+.code-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--muted);
+  padding: 6px;
+}
+
+.tabs {
+  display: flex;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 57px;
+  z-index: 9;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 4px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+main {
+  flex: 1;
+  padding: 16px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.big-stat {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.big-stat-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.big-stat-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.log-form {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+h3 {
+  font-size: 0.95rem;
+  color: var(--muted);
+  margin: 0 0 10px 4px;
+}
+
+.entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.entry-list li {
+  background: var(--card-bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  padding: 4px 8px;
+}
+
+.delete-btn:active { color: var(--danger); }

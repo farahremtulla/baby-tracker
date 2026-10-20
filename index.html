@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#5b8def" />
+<title>Baby Tracker</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icons/icon.svg" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<div id="setup-screen" class="screen">
+  <h1>👶 Baby Tracker</h1>
+
+  <div class="card">
+    <h2>Create a Family</h2>
+    <input id="family-name-input" type="text" placeholder="e.g. The Smiths" />
+    <button id="create-family-btn" class="primary-btn">Create Family</button>
+  </div>
+
+  <div class="card">
+    <h2>Join a Family</h2>
+    <input id="family-code-input" type="text" placeholder="Enter family code" maxlength="6" style="text-transform:uppercase" />
+    <button id="join-family-btn" class="primary-btn">Join Family</button>
+  </div>
+
+  <p id="setup-error" class="error"></p>
+</div>
+
+<div id="main-screen" class="screen hidden">
+  <header>
+    <div>
+      <strong id="family-name-display"></strong>
+      <span class="code-badge" id="family-code-display"></span>
+    </div>
+    <button id="leave-family-btn" class="icon-btn" title="Leave family">⎋</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="sleep">😴 Sleep</button>
+    <button class="tab-btn" data-tab="feeds">🍼 Feeds</button>
+    <button class="tab-btn" data-tab="solids">🥣 Solids</button>
+  </nav>
+
+  <main>
+    <section id="tab-sleep" class="tab-panel active">
+      <div class="big-stat">
+        <div class="big-stat-label" id="sleep-status-label">Awake for</div>
+        <div class="big-stat-value" id="sleep-timer">--</div>
+        <button id="sleep-toggle-btn" class="primary-btn">Start Nap</button>
+      </div>
+      <h3>Recent Sleep</h3>
+      <ul id="sleep-list" class="entry-list"></ul>
+    </section>
+
+    <section id="tab-feeds" class="tab-panel">
+      <div class="big-stat">
+        <div class="big-stat-label">Time since last feed</div>
+        <div class="big-stat-value" id="feed-timer">--</div>
+      </div>
+      <form id="feed-form" class="log-form">
+        <label>Time
+          <input type="datetime-local" id="feed-time" required />
+        </label>
+        <label>Amount (oz)
+          <input type="number" id="feed-amount" placeholder="oz" step="0.5" min="0" required />
+        </label>
+        <button type="submit" class="primary-btn">Log Feed</button>
+      </form>
+      <h3>Recent Feeds</h3>
+      <ul id="feeds-list" class="entry-list"></ul>
+    </section>
+
+    <section id="tab-solids" class="tab-panel">
+      <div class="big-stat">
+        <div class="big-stat-label">Time since last meal</div>
+        <div class="big-stat-value" id="solids-timer">--</div>
+      </div>
+      <form id="solids-form" class="log-form">
+        <label>Time
+          <input type="datetime-local" id="solids-time" required />
+        </label>
+        <label>Food
+          <select id="solids-food" required>
+            <option value="" disabled selected>Select food...</option>
+            <option value="__other__">Other...</option>
+          </select>
+        </label>
+        <input type="text" id="solids-food-other" placeholder="Enter food" class="hidden" />
+        <button type="submit" class="primary-btn">Log Meal</button>
+      </form>
+      <h3>Recent Meals</h3>
+      <ul id="solids-list" class="entry-list"></ul>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
