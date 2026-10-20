@@ -35,6 +35,12 @@ function toDate(ts) {
   return ts && typeof ts.toDate === "function" ? ts.toDate() : new Date(ts);
 }
 
+function toDatetimeLocalValue(date) {
+  const d = new Date(date);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+}
+
 // ---------- Setup screen ----------
 el("create-family-btn").addEventListener("click", async () => {
   const name = el("family-name-input").value.trim();
@@ -98,6 +104,8 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 });
 
 // ---------- Sleep ----------
+let editingSleepId = null;
+
 function renderSleep() {
   const ongoing = sleepSessions.find((s) => !s.endTime);
   const toggleBtn = el("sleep-toggle-btn");
@@ -119,14 +127,52 @@ function renderSleep() {
     const start = toDate(s.startTime);
     const end = s.endTime ? toDate(s.endTime) : null;
     const li = document.createElement("li");
-    li.innerHTML = `
-      <div>
-        <strong>${formatTime(start)}</strong>${end ? ` &rarr; ${formatTime(end)}` : " (ongoing)"}
-        <div class="muted">${end ? formatDuration(end - start) : ""}</div>
-      </div>
-      <button class="delete-btn" aria-label="Delete">✕</button>
-    `;
-    li.querySelector(".delete-btn").addEventListener("click", () => db.deleteSleep(familyCode, s.id));
+
+    if (s.id === editingSleepId) {
+      li.classList.add("edit-row");
+      li.innerHTML = `
+        <label>Start
+          <input type="datetime-local" class="edit-start" value="${toDatetimeLocalValue(start)}" />
+        </label>
+        ${end ? `
+        <label>End
+          <input type="datetime-local" class="edit-end" value="${toDatetimeLocalValue(end)}" />
+        </label>` : ""}
+        <div class="edit-actions">
+          <button class="save-btn primary-btn">Save</button>
+          <button class="cancel-btn">Cancel</button>
+        </div>
+      `;
+      li.querySelector(".save-btn").addEventListener("click", async () => {
+        const newStart = new Date(li.querySelector(".edit-start").value);
+        const endInput = li.querySelector(".edit-end");
+        const newEnd = endInput ? new Date(endInput.value) : undefined;
+        await db.updateSleepTimes(familyCode, s.id, { startTime: newStart, endTime: newEnd });
+        editingSleepId = null;
+        renderSleep();
+      });
+      li.querySelector(".cancel-btn").addEventListener("click", () => {
+        editingSleepId = null;
+        renderSleep();
+      });
+    } else {
+      li.innerHTML = `
+        <div>
+          <strong>${formatTime(start)}</strong>${end ? ` &rarr; ${formatTime(end)}` : " (ongoing)"}
+          <div class="muted">${end ? formatDuration(end - start) : ""}</div>
+        </div>
+        <div class="entry-actions">
+          <button class="edit-btn" aria-label="Edit">✎</button>
+          <button class="delete-btn" aria-label="Delete">✕</button>
+        </div>
+      `;
+      li.querySelector(".edit-btn").addEventListener("click", () => {
+        editingSleepId = s.id;
+        renderSleep();
+      });
+      li.querySelector(".delete-btn").addEventListener("click", () => db.deleteSleep(familyCode, s.id));
+    }
+
     list.appendChild(li);
   });
 }
@@ -158,20 +204,58 @@ el("feed-form").addEventListener("submit", async (e) => {
   setDefaultDatetime(el("feed-time"));
 });
 
+let editingFeedId = null;
+
 function renderFeeds() {
   const list = el("feeds-list");
   list.innerHTML = "";
   feeds.slice(0, 15).forEach((f) => {
     const time = toDate(f.time);
     const li = document.createElement("li");
-    li.innerHTML = `
-      <div>
-        <strong>${f.amountOz} oz</strong>
-        <div class="muted">${formatTime(time)}</div>
-      </div>
-      <button class="delete-btn" aria-label="Delete">✕</button>
-    `;
-    li.querySelector(".delete-btn").addEventListener("click", () => db.deleteFeed(familyCode, f.id));
+
+    if (f.id === editingFeedId) {
+      li.classList.add("edit-row");
+      li.innerHTML = `
+        <label>Time
+          <input type="datetime-local" class="edit-time" value="${toDatetimeLocalValue(time)}" />
+        </label>
+        <label>Amount (oz)
+          <input type="number" class="edit-amount" value="${f.amountOz}" step="0.5" min="0" />
+        </label>
+        <div class="edit-actions">
+          <button class="save-btn primary-btn">Save</button>
+          <button class="cancel-btn">Cancel</button>
+        </div>
+      `;
+      li.querySelector(".save-btn").addEventListener("click", async () => {
+        const newTime = new Date(li.querySelector(".edit-time").value);
+        const newAmount = parseFloat(li.querySelector(".edit-amount").value);
+        await db.updateFeed(familyCode, f.id, { time: newTime, amountOz: newAmount });
+        editingFeedId = null;
+        renderFeeds();
+      });
+      li.querySelector(".cancel-btn").addEventListener("click", () => {
+        editingFeedId = null;
+        renderFeeds();
+      });
+    } else {
+      li.innerHTML = `
+        <div>
+          <strong>${f.amountOz} oz</strong>
+          <div class="muted">${formatTime(time)}</div>
+        </div>
+        <div class="entry-actions">
+          <button class="edit-btn" aria-label="Edit">✎</button>
+          <button class="delete-btn" aria-label="Delete">✕</button>
+        </div>
+      `;
+      li.querySelector(".edit-btn").addEventListener("click", () => {
+        editingFeedId = f.id;
+        renderFeeds();
+      });
+      li.querySelector(".delete-btn").addEventListener("click", () => db.deleteFeed(familyCode, f.id));
+    }
+
     list.appendChild(li);
   });
 }
@@ -200,20 +284,73 @@ el("solids-form").addEventListener("submit", async (e) => {
   el("solids-food-other").classList.add("hidden");
 });
 
+let editingSolidId = null;
+
 function renderSolids() {
   const list = el("solids-list");
   list.innerHTML = "";
   solids.slice(0, 15).forEach((s) => {
     const time = toDate(s.time);
     const li = document.createElement("li");
-    li.innerHTML = `
-      <div>
-        <strong>${s.food}</strong>
-        <div class="muted">${formatTime(time)}</div>
-      </div>
-      <button class="delete-btn" aria-label="Delete">✕</button>
-    `;
-    li.querySelector(".delete-btn").addEventListener("click", () => db.deleteSolid(familyCode, s.id));
+
+    if (s.id === editingSolidId) {
+      li.classList.add("edit-row");
+      const isKnownFood = FOOD_OPTIONS.includes(s.food);
+      const foodOptions = FOOD_OPTIONS.map(
+        (food) => `<option value="${food}" ${food === s.food ? "selected" : ""}>${food}</option>`
+      ).join("");
+      li.innerHTML = `
+        <label>Time
+          <input type="datetime-local" class="edit-time" value="${toDatetimeLocalValue(time)}" />
+        </label>
+        <label>Food
+          <select class="edit-food">
+            ${foodOptions}
+            <option value="__other__" ${isKnownFood ? "" : "selected"}>Other...</option>
+          </select>
+        </label>
+        <input type="text" class="edit-food-other ${isKnownFood ? "hidden" : ""}" value="${isKnownFood ? "" : s.food}" placeholder="Enter food" />
+        <div class="edit-actions">
+          <button class="save-btn primary-btn">Save</button>
+          <button class="cancel-btn">Cancel</button>
+        </div>
+      `;
+      const editFoodSelect = li.querySelector(".edit-food");
+      const editFoodOther = li.querySelector(".edit-food-other");
+      editFoodSelect.addEventListener("change", () => {
+        editFoodOther.classList.toggle("hidden", editFoodSelect.value !== "__other__");
+      });
+      li.querySelector(".save-btn").addEventListener("click", async () => {
+        const newTime = new Date(li.querySelector(".edit-time").value);
+        let newFood = editFoodSelect.value;
+        if (newFood === "__other__") newFood = editFoodOther.value.trim();
+        if (!newFood) return;
+        await db.updateSolid(familyCode, s.id, { time: newTime, food: newFood });
+        editingSolidId = null;
+        renderSolids();
+      });
+      li.querySelector(".cancel-btn").addEventListener("click", () => {
+        editingSolidId = null;
+        renderSolids();
+      });
+    } else {
+      li.innerHTML = `
+        <div>
+          <strong>${s.food}</strong>
+          <div class="muted">${formatTime(time)}</div>
+        </div>
+        <div class="entry-actions">
+          <button class="edit-btn" aria-label="Edit">✎</button>
+          <button class="delete-btn" aria-label="Delete">✕</button>
+        </div>
+      `;
+      li.querySelector(".edit-btn").addEventListener("click", () => {
+        editingSolidId = s.id;
+        renderSolids();
+      });
+      li.querySelector(".delete-btn").addEventListener("click", () => db.deleteSolid(familyCode, s.id));
+    }
+
     list.appendChild(li);
   });
 }

@@ -236,3 +236,53 @@ h3 {
 }
 
 .delete-btn:active { color: var(--danger); }
+
+.entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  padding: 4px 8px;
+}
+
+.edit-btn:active { color: var(--primary); }
+
+.entry-list li.edit-row {
+  display: block;
+  padding: 14px;
+}
+
+.edit-row label {
+  margin-bottom: 8px;
+}
+
+.edit-row input {
+  margin-bottom: 0;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.edit-actions .primary-btn {
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--muted);
+}

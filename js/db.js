@@ -96,6 +96,13 @@ export async function endSleep(code, sessionId) {
 export async function deleteSleep(code, sessionId) {
   await deleteDoc(doc(db, "families", code, "sleepSessions", sessionId));
 }
+export async function updateSleepTimes(code, sessionId, { startTime, endTime }) {
+  const data = { startTime: Timestamp.fromDate(startTime) };
+  if (endTime !== undefined) {
+    data.endTime = endTime === null ? null : Timestamp.fromDate(endTime);
+  }
+  await updateDoc(doc(db, "families", code, "sleepSessions", sessionId), data);
+}
 
 // --- Feeds ---
 export function subscribeFeeds(code, cb) {
@@ -112,6 +119,12 @@ export async function addFeed(code, time, amountOz) {
 export async function deleteFeed(code, id) {
   await deleteDoc(doc(db, "families", code, "feeds", id));
 }
+export async function updateFeed(code, id, { time, amountOz }) {
+  await updateDoc(doc(db, "families", code, "feeds", id), {
+    time: Timestamp.fromDate(time),
+    amountOz,
+  });
+}
 
 // --- Solids ---
 export function subscribeSolids(code, cb) {
@@ -127,4 +140,10 @@ export async function addSolid(code, time, food) {
 }
 export async function deleteSolid(code, id) {
   await deleteDoc(doc(db, "families", code, "solids", id));
+}
+export async function updateSolid(code, id, { time, food }) {
+  await updateDoc(doc(db, "families", code, "solids", id), {
+    time: Timestamp.fromDate(time),
+    food,
+  });
 }
